@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QO Lernseite</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%234f5bd5'/%3E%3Cpath d='M5 18c3-8 6-8 9 0s6 8 9 0' stroke='white' stroke-width='2.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<script>
+  // Mathe wie in Anki: \( … \) inline, \[ … \] abgesetzt
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] },
+    startup: {
+      typeset: false,
+      ready() {
+        MathJax.startup.defaultReady();
+        MathJax.startup.promise.then(() => { if (typeof App !== 'undefined') App.typeset(App.view); });
+      }
+    }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+</head>
+<body>
+<header class="top">
+  <div class="brand">Quantum Optics <span>HS26</span></div>
+  <nav id="tabs" class="tabs" role="tablist" aria-label="Reiter"></nav>
+  <div class="top-actions">
+    <button id="syncPill" class="pill" data-state="off" title="Sync"><span class="dot"></span><span class="label">Sync aus</span></button>
+    <button id="settingsBtn" class="icon-btn" aria-label="Einstellungen" title="Einstellungen">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="view" class="view"></main>
+
+<dialog id="settings" class="dlg">
+  <form method="dialog">
+    <div class="dlg-head">
+      <h2>Einstellungen</h2>
+      <button class="icon-btn" value="close" aria-label="Schließen">✕</button>
+    </div>
+
+    <section>
+      <h3>Sync Laptop ↔ Handy</h3>
+      <p class="muted small">Dein Stand liegt in einem privaten GitHub-Gist. Auf jedem Gerät einmal denselben Token eintragen, danach läuft es automatisch.</p>
+      <ol class="small steps">
+        <li><a href="https://github.com/settings/tokens/new?scopes=gist&amp;description=QO-Lernseite%20Sync" target="_blank" rel="noopener">Token erstellen</a> (nur der Haken bei „gist“, Ablauf nach Wahl)</li>
+        <li>Hier einfügen und „Verbinden“ drücken</li>
+      </ol>
+      <div class="row">
+        <input id="ghToken" type="password" placeholder="ghp_…" autocomplete="off" spellcheck="false">
+        <button type="button" id="syncConnect" class="btn primary">Verbinden</button>
+      </div>
+      <p id="syncInfo" class="muted small"></p>
+      <div class="row">
+        <button type="button" id="syncNow" class="btn">Jetzt syncen</button>
+        <button type="button" id="syncOff" class="btn ghost">Auf diesem Gerät trennen</button>
+      </div>
+    </section>
+
+    <section>
+      <h3>Backup</h3>
+      <p class="muted small">Sicherheitskopie aller Häkchen, ToDos und Karten. Beim Einspielen wird zusammengeführt, nichts überschrieben.</p>
+      <div class="row">
+        <button type="button" id="backupDl" class="btn">Backup herunterladen</button>
+        <label class="btn">Backup einspielen<input id="backupUp" type="file" accept=".json,application/json" hidden></label>
+      </div>
+    </section>
+
+    <section>
+      <h3>Darstellung</h3>
+      <div class="seg" role="radiogroup" aria-label="Farbschema">
+        <label><input type="radio" name="theme" value="auto"><span>Auto</span></label>
+        <label><input type="radio" name="theme" value="light"><span>Hell</span></label>
+        <label><input type="radio" name="theme" value="dark"><span>Dunkel</span></label>
+      </div>
+    </section>
+  </form>
+</dialog>
+
+<div id="toast" class="toast" role="status" hidden></div>
+
+<!-- Gerüst -->
+<script src="app-core.js"></script>
+<script src="app-sync.js"></script>
+<!-- Daten -->
+<script src="data-themen.js"></script>
+<!-- Reiter: neuer Reiter = neue Datei tab-xyz.js + eine Zeile hier -->
+<script src="tab-themen.js"></script>
+<script src="tab-todo.js"></script>
+<script src="tab-anki.js"></script>
+
+<script>App.start();</script>
+</body>
+</html>
